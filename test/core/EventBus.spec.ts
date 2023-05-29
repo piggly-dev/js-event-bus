@@ -1,4 +1,5 @@
-import { EventBus, EventDispatcher, LocalEventDriver } from '@/core';
+import { EventDispatcher, LocalEventDriver } from '@/core';
+import EventBus from '@/index';
 import { StubEventHandler, StubEventPayload } from '@test/__stubs__';
 
 describe('EventBus', () => {

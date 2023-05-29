@@ -2,17 +2,60 @@ import EventDispatcher from './EventDispatcher';
 import EventHandler from './EventHandler';
 import EventPayload from './EventPayload';
 import LocalEventDriver from './drivers/LocalEventDriver';
-import { EventDriverInterface } from './types';
+import { EventBusOptions, EventDriverInterface } from './types';
 
+/**
+ * @file Event bus to subscribe, unsubscribe and publish events.
+ * @copyright Piggly Lab 2023
+ */
 export default class EventBus {
+	/**
+	 * Singleton instance.
+	 *
+	 * @type {EventBus}
+	 * @private
+	 * @static
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
 	private static _instance: EventBus;
 
-	private _driver: EventDriverInterface;
+	/**
+	 * Event driver mapping.
+	 *
+	 * @type {Map<string, EventDriverInterface>}
+	 * @private
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	private _driver: Map<string, EventDriverInterface>;
 
+	/**
+	 * Construct with default driver.
+	 *
+	 * @constructor
+	 * @private
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
 	private constructor() {
-		this._driver = new LocalEventDriver();
+		this._driver = new Map();
+		this.register(new LocalEventDriver());
 	}
 
+	/**
+	 * Get event bus instance.
+	 *
+	 * @returns {EventBus}
+	 * @public
+	 * @static
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
 	public static get instance(): EventBus {
 		if (EventBus._instance === undefined) {
 			EventBus._instance = new EventBus();
@@ -21,38 +64,143 @@ export default class EventBus {
 		return EventBus._instance;
 	}
 
-	register(driver: EventDriverInterface): void {
-		this._driver = driver;
+	/**
+	 * Register a new driver for event bus.
+	 *
+	 * @param {EventDriverInterface} driver Event driver object.
+	 * @returns {void}
+	 * @public
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public register(driver: EventDriverInterface): void {
+		this._driver.set(driver.name, driver);
 	}
 
-	publish<Event extends EventPayload>(event: Event): boolean {
-		const dispatcher = this._driver.get(event.name);
+	/**
+	 * Publish an event to event bus, where Event is an event payload object.
+	 *
+	 * @param {Event} event Event payload object.
+	 * @param {EventBusOptions} options With driver name.
+	 * @returns {boolean}
+	 * @public
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public publish<Event extends EventPayload>(
+		event: Event,
+		options?: EventBusOptions
+	): boolean {
+		const driver = this.driver(options);
+		const dispatcher = driver.get(event.name);
 
 		if (dispatcher === undefined) {
 			return false;
 		}
 
-		return dispatcher.dispatch(event);
+		return dispatcher.dispatch<Event>(event);
 	}
 
-	subscribe(event_name: string, handler: EventHandler): boolean {
-		let dispatcher = this._driver.get(event_name);
+	/**
+	 * Subscribe handler to an event.
+	 *
+	 * @param {string} event_name
+	 * @param {EventHandler} handler Event handler object.
+	 * @param {EventBusOptions} options With driver name.
+	 * @returns {boolean}
+	 * @public
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public subscribe(
+		event_name: string,
+		handler: EventHandler,
+		options?: EventBusOptions
+	): boolean {
+		const driver = this.driver(options);
+		let dispatcher = driver.get(event_name);
 
 		if (dispatcher === undefined) {
 			dispatcher = new EventDispatcher(event_name);
-			this._driver.set(event_name, dispatcher);
+			driver.set(event_name, dispatcher);
 		}
 
 		return dispatcher.register(handler);
 	}
 
-	unsubscribe(event_name: string, handler: EventHandler): boolean {
-		const dispatcher = this._driver.get(event_name);
+	/**
+	 * Unsubscribe handler from an event.
+	 *
+	 * @param {string} event_name
+	 * @param {EventHandler} handler Event handler object.
+	 * @param {EventBusOptions} options With driver name.
+	 * @returns {boolean}
+	 * @public
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public unsubscribe(
+		event_name: string,
+		handler: EventHandler,
+		options?: EventBusOptions
+	): boolean {
+		const driver = this.driver(options);
+		const dispatcher = driver.get(event_name);
 
 		if (dispatcher === undefined) {
 			return false;
 		}
 
 		return dispatcher.unregister(handler);
+	}
+
+	/**
+	 * Unsubscribe all handlers from an event.
+	 *
+	 * @param {string} event_name
+	 * @param {EventBusOptions} options With driver name.
+	 * @returns {boolean}
+	 * @public
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public unsubscribeAll(event_name: string, options?: EventBusOptions): boolean {
+		const driver = this.driver(options);
+		const dispatcher = driver.get(event_name);
+
+		if (dispatcher === undefined) {
+			return false;
+		}
+
+		return dispatcher.unregisterAll();
+	}
+
+	/**
+	 *
+	 * @param {EventBusOptions} options
+	 * @returns {EventDriverInterface}
+	 * @throws {Error} When driver is not found.
+	 * @protected
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	protected driver(options?: EventBusOptions): EventDriverInterface {
+		if (options === undefined || options.driver === undefined) {
+			return this._driver.get('local') as EventDriverInterface;
+		}
+
+		const driver = this._driver.get(options.driver);
+
+		if (driver === undefined) {
+			throw new Error(`EventBus driver ${options.driver} not found.`);
+		}
+
+		return driver;
 	}
 }

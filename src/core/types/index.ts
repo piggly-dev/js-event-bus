@@ -6,3 +6,7 @@ export interface EventDriverInterface {
 	get(event_name: string): EventDispatcher | undefined;
 	has(event_name: string): boolean;
 }
+
+export type EventBusOptions = {
+	driver: string;
+};

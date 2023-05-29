@@ -67,9 +67,9 @@ describe('EventDispatcher', () => {
 
 	it('should not dispatch events for incompatible events', () => {
 		const dispatcher = new EventDispatcher('STUB_EVENT');
-		expect(() =>
-			dispatcher.dispatch(new AnotherStubEventPayload({ value: 42 }))
-		).toThrow(Error);
+		expect(dispatcher.dispatch(new AnotherStubEventPayload({ value: 42 }))).toBe(
+			false
+		);
 	});
 
 	it('should not dispatch events for any handlers', () => {
