@@ -1,7 +1,7 @@
 {
 	"name": "@piggly/event-bus",
-	"version": "0.1.0",
-	"description": "Event Bus library for any kind of javascript application.",
+	"version": "1.0.0",
+	"description": "An ESM/CommonJS library following Oriented-Object Programming pattern to manager an Event Bus.",
 	"scripts": {
 		"check": "tsc --noEmit",
 		"clean": "rimraf dist",
@@ -21,6 +21,12 @@
 	"main": "./dist/cjs/index.js",
 	"module": "./dist/esm/index.js",
 	"types": "./dist/esm/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/esm/index.js",
+			"require": "./dist/cjs/index.js"
+		}
+	},
 	"files": [
 		"dist",
 		"LICENSE",
@@ -31,7 +37,11 @@
 		"events",
 		"handlers"
 	],
-	"author": "caiquearaujo",
+	"author": {
+		"name": "Caique Araujo",
+		"email": "caique@piggly.com.br",
+		"url": "https://github.com/caiquearaujo"
+	},
 	"license": "MIT",
 	"homepage": "https://github.com/piggly-dev/js-event-bus#readme",
 	"repository": {
