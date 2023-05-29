@@ -11,6 +11,10 @@ export default class LocalEventDriver implements EventDriverInterface {
 	}
 
 	public set(event_name: string, dispatcher: EventDispatcher): void {
+		if (this.has(event_name)) {
+			throw new Error(`Dispatcher for event ${event_name} already exists`);
+		}
+
 		this.dispatchers.set(event_name, dispatcher);
 	}
 

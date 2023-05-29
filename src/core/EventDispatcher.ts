@@ -12,6 +12,12 @@ export default class EventDispatcher {
 	}
 
 	public dispatch<Event extends EventPayload>(event: Event): boolean {
+		if (event.name !== this.name) {
+			throw new Error(
+				`Event ${event.name} is incompatible with dispatcher ${this.name}`
+			);
+		}
+
 		if (this.handlers.length === 0) {
 			return false;
 		}
@@ -21,7 +27,7 @@ export default class EventDispatcher {
 	}
 
 	public register(handler: EventHandler): boolean {
-		if (this.handlers.includes(handler)) {
+		if (this.handlers.find(h => h.constructor === handler.constructor)) {
 			return false;
 		}
 

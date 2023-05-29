@@ -8,7 +8,7 @@ export default class EventPayload<EventData = Record<string, any>> {
 	public readonly issued_at: number;
 
 	constructor(name: string, data: EventData) {
-		this.id = Math.random().toString(36).substr(2, 9);
+		this.id = this.generateId();
 		this.name = name;
 		this.data = data;
 		this.issued_at = Date.now();
