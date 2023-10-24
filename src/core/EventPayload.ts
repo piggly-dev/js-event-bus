@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 /**
  * Event payload with data.
  */
@@ -74,11 +76,11 @@ export default class EventPayload<EventData = Record<string, any>> {
 	 *
 	 * @returns {string}
 	 * @public
-	 * @since 1.0.0
+	 * @since 1.2.0
 	 * @memberof EventPayload
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public generateId(): string {
-		return (Date.now() * Math.random()).toString() + Math.random().toString(36);
+		return uuidv4();
 	}
 }
