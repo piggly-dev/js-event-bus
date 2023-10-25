@@ -1,5 +1,6 @@
-import EventHandler from './EventHandler';
 import EventPayload from './EventPayload';
+
+import type { EventDispatcherResponse, EventHandler } from './types';
 
 /**
  * @file Event dispatcher, where you can register handlers to an unique event and dispatch to them.
@@ -16,7 +17,7 @@ export default class EventDispatcher {
 	 * @memberof EventDispatcher
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public readonly handlers: Array<EventHandler>;
+	public readonly handlers: Array<EventHandler<any>>;
 
 	/**
 	 * Event name.
@@ -49,23 +50,24 @@ export default class EventDispatcher {
 	 * Dispatch event for handlers, where Event is an event payload object.
 	 *
 	 * @param {Event} event Event payload object.
-	 * @returns {boolean}
+	 * @returns {Promise<boolean>}
 	 * @public
 	 * @since 1.0.0
 	 * @memberof EventDispatcher
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public dispatch<Event extends EventPayload>(event: Event): boolean {
+	public async dispatch<Event extends EventPayload>(
+		event: Event
+	): Promise<EventDispatcherResponse> {
 		if (event.name !== this.name) {
-			return false;
+			return undefined;
 		}
 
 		if (this.handlers.length === 0) {
-			return false;
+			return undefined;
 		}
 
-		this.handlers.forEach(handler => handler.handle(event));
-		return true;
+		return Promise.allSettled(this.handlers.map(handler => handler(event)));
 	}
 
 	/**
@@ -78,8 +80,10 @@ export default class EventDispatcher {
 	 * @memberof EventDispatcher
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public register(handler: EventHandler): boolean {
-		if (this.handlers.find(h => h.constructor === handler.constructor)) {
+	public register<Event extends EventPayload>(
+		handler: EventHandler<Event>
+	): boolean {
+		if (this.handlers.find(h => h === handler)) {
 			return false;
 		}
 
@@ -97,11 +101,11 @@ export default class EventDispatcher {
 	 * @memberof EventDispatcher
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public unregister(handler: EventHandler): boolean {
+	public unregister<Event extends EventPayload>(
+		handler: EventHandler<Event>
+	): boolean {
 		// const index = this.handlers.indexOf(handler);
-		const index = this.handlers.findIndex(
-			h => h.constructor === handler.constructor
-		);
+		const index = this.handlers.findIndex(h => h === handler);
 
 		if (index === -1) {
 			return false;

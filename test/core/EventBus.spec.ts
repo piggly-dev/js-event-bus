@@ -1,6 +1,6 @@
 import { EventDispatcher, LocalEventDriver } from '@/core';
 import EventBus from '@/index';
-import { StubEventHandler, StubEventPayload } from '@test/__stubs__';
+import { StubEventPayload, stubEventHandlerCallback } from '@test/__stubs__';
 
 describe('EventBus', () => {
 	it('should have a singleton instance', () => {
@@ -9,7 +9,7 @@ describe('EventBus', () => {
 
 	it('should subscribe to a existing event', () => {
 		const dispatcher = new EventDispatcher('STUB_EVENT');
-		const handler = new StubEventHandler();
+		const handler = stubEventHandlerCallback;
 
 		const getFn = jest.fn().mockReturnValue(dispatcher);
 		const registerFn = jest.fn().mockReturnValue(true);
@@ -26,7 +26,7 @@ describe('EventBus', () => {
 	});
 
 	it('should subscribe to an non existing event', () => {
-		const handler = new StubEventHandler();
+		const handler = stubEventHandlerCallback;
 		const registerFn = jest.fn().mockReturnValue(true);
 
 		jest.spyOn(LocalEventDriver.prototype, 'get').mockReturnValue(undefined);
@@ -41,7 +41,7 @@ describe('EventBus', () => {
 	});
 
 	it('should not unsubscribe of a non existing event', () => {
-		const handler = new StubEventHandler();
+		const handler = stubEventHandlerCallback;
 
 		const getFn = jest.fn().mockReturnValue(undefined);
 		jest.spyOn(LocalEventDriver.prototype, 'get').mockImplementation(getFn);
@@ -52,7 +52,7 @@ describe('EventBus', () => {
 
 	it('should unsubscribe of an existing event', () => {
 		const dispatcher = new EventDispatcher('STUB_EVENT');
-		const handler = new StubEventHandler();
+		const handler = stubEventHandlerCallback;
 
 		const unregisterFn = jest.fn().mockReturnValue(true);
 
@@ -66,28 +66,49 @@ describe('EventBus', () => {
 		expect(unregisterFn).toHaveBeenCalledWith(handler);
 	});
 
+	it('should not unsubscribe all of a non existing event', () => {
+		const getFn = jest.fn().mockReturnValue(undefined);
+		jest.spyOn(LocalEventDriver.prototype, 'get').mockImplementation(getFn);
+
+		expect(EventBus.instance.unsubscribeAll('STUB_EVENT')).toBe(false);
+		expect(getFn).toHaveBeenCalledWith('STUB_EVENT');
+	});
+
+	it('should unsubscribe all of an existing event', () => {
+		const dispatcher = new EventDispatcher('STUB_EVENT');
+		const unregisterFn = jest.fn().mockReturnValue(true);
+
+		jest.spyOn(LocalEventDriver.prototype, 'get').mockReturnValue(dispatcher);
+
+		jest
+			.spyOn(EventDispatcher.prototype, 'unregisterAll')
+			.mockImplementation(unregisterFn);
+
+		expect(EventBus.instance.unsubscribeAll('STUB_EVENT')).toBe(true);
+	});
+
 	it('should not publish to a non existing event', () => {
-		const payload = new StubEventPayload({ value: 42 });
+		const payload = new StubEventPayload({ size: 42 });
 
 		const getFn = jest.fn().mockReturnValue(undefined);
 		jest.spyOn(LocalEventDriver.prototype, 'get').mockImplementation(getFn);
 
-		expect(EventBus.instance.publish(payload)).toBe(false);
+		expect(EventBus.instance.publish(payload)).resolves.toBe(undefined);
 		expect(getFn).toHaveBeenCalledWith('STUB_EVENT');
 	});
 
 	it('should publish to an existing event', () => {
 		const dispatcher = new EventDispatcher('STUB_EVENT');
-		const payload = new StubEventPayload({ value: 42 });
+		const payload = new StubEventPayload({ size: 42 });
 
-		const dispatchFn = jest.fn().mockReturnValue(true);
+		const dispatchFn = jest.fn().mockResolvedValue([true]);
 
 		jest.spyOn(LocalEventDriver.prototype, 'get').mockReturnValue(dispatcher);
 		jest
 			.spyOn(EventDispatcher.prototype, 'dispatch')
 			.mockImplementation(dispatchFn);
 
-		expect(EventBus.instance.publish(payload)).toBe(true);
+		expect(EventBus.instance.publish(payload)).resolves.toStrictEqual([true]);
 		expect(dispatchFn).toHaveBeenCalledWith(payload);
 	});
 });

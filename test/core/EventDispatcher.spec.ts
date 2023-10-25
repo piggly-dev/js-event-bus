@@ -1,9 +1,9 @@
 import { EventDispatcher } from '@/core';
 import {
-	AnotherStubEventHandler,
 	AnotherStubEventPayload,
-	StubEventHandler,
 	StubEventPayload,
+	anotherStubEventHandlerCallback,
+	stubEventHandlerCallback,
 } from '@test/__stubs__';
 
 beforeAll(() => {
@@ -15,79 +15,93 @@ afterAll(() => {
 });
 
 describe('EventDispatcher', () => {
-	it('should register a handler', () => {
-		const dispatcher = new EventDispatcher('STUB_EVENT');
+	describe('EventHandler as Functions', () => {
+		it('should register a handler', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
 
-		expect(dispatcher.handlers.length).toBe(0);
-		expect(dispatcher.name).toBe('STUB_EVENT');
+			expect(dispatcher.handlers.length).toBe(0);
+			expect(dispatcher.name).toBe('STUB_EVENT');
 
-		const handler = new StubEventHandler();
+			const handler = stubEventHandlerCallback;
 
-		expect(dispatcher.register(handler)).toBe(true);
-		expect(dispatcher.handlers.length).toBe(1);
-	});
+			expect(dispatcher.register(handler)).toBe(true);
+			expect(dispatcher.handlers.length).toBe(1);
+		});
 
-	it('should not register an existing handler', () => {
-		const dispatcher = new EventDispatcher('STUB_EVENT');
-		const handler = new StubEventHandler();
-		dispatcher.register(handler);
+		it('should not register an existing handler', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			const handler = stubEventHandlerCallback;
+			// first registration
+			dispatcher.register(handler);
 
-		expect(dispatcher.register(handler)).toBe(false);
-		expect(dispatcher.handlers.length).toBe(1);
+			expect(dispatcher.register(handler)).toBe(false);
+			expect(dispatcher.handlers.length).toBe(1);
 
-		expect(dispatcher.register(new StubEventHandler())).toBe(false);
-		expect(dispatcher.handlers.length).toBe(1);
+			expect(dispatcher.register(stubEventHandlerCallback)).toBe(false);
+			expect(dispatcher.handlers.length).toBe(1);
 
-		expect(dispatcher.register(new StubEventHandler())).toBe(false);
-		expect(dispatcher.register(new AnotherStubEventHandler())).toBe(true);
-		expect(dispatcher.handlers.length).toBe(2);
-	});
+			expect(dispatcher.register(stubEventHandlerCallback)).toBe(false);
+			expect(dispatcher.register(anotherStubEventHandlerCallback)).toBe(true);
+			expect(dispatcher.handlers.length).toBe(2);
+		});
 
-	it('should not unregister a handler', () => {
-		const dispatcher = new EventDispatcher('STUB_EVENT');
-		const handler = new StubEventHandler();
+		it('should not unregister a handler', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			const handler = stubEventHandlerCallback;
 
-		expect(dispatcher.unregister(handler)).toBe(false);
-	});
+			expect(dispatcher.unregister(handler)).toBe(false);
+		});
 
-	it('should unregister a handler', () => {
-		const dispatcher = new EventDispatcher('STUB_EVENT');
-		const handler = new StubEventHandler();
-		dispatcher.register(handler);
+		it('should unregister a handler', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			const handler = stubEventHandlerCallback;
+			dispatcher.register(handler);
 
-		expect(dispatcher.unregister(handler)).toBe(true);
-		expect(dispatcher.handlers.length).toBe(0);
+			expect(dispatcher.unregister(handler)).toBe(true);
+			expect(dispatcher.handlers.length).toBe(0);
 
-		dispatcher.register(handler);
-		dispatcher.register(new StubEventHandler());
+			dispatcher.register(handler);
+			dispatcher.register(stubEventHandlerCallback);
 
-		expect(dispatcher.unregister(handler)).toBe(true);
-		expect(dispatcher.handlers.length).toBe(0);
-	});
+			expect(dispatcher.unregister(handler)).toBe(true);
+			expect(dispatcher.handlers.length).toBe(0);
+		});
 
-	it('should not dispatch events for incompatible events', () => {
-		const dispatcher = new EventDispatcher('STUB_EVENT');
-		expect(dispatcher.dispatch(new AnotherStubEventPayload({ value: 42 }))).toBe(
-			false
-		);
-	});
+		it('should not dispatch events for incompatible events', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			expect(
+				dispatcher.dispatch(new AnotherStubEventPayload({ amount: 42 }))
+			).resolves.toBe(undefined);
+		});
 
-	it('should not dispatch events for any handlers', () => {
-		const dispatcher = new EventDispatcher('STUB_EVENT');
-		expect(dispatcher.dispatch(new StubEventPayload({ value: 42 }))).toBe(false);
-	});
+		it('should not dispatch events for any handlers', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			expect(
+				dispatcher.dispatch(new StubEventPayload({ size: 42 }))
+			).resolves.toBe(undefined);
+		});
 
-	it('should dispatch events for any handlers', () => {
-		const handleFn = jest.fn();
-		jest.spyOn(StubEventHandler.prototype, 'handle').mockImplementation(handleFn);
+		it('should dispatch events for any handlers', async () => {
+			const handleOneFn = jest.fn().mockReturnValue(true);
 
-		const dispatcher = new EventDispatcher('STUB_EVENT');
-		const handler = new StubEventHandler();
-		const event = new StubEventPayload({ value: 42 });
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			const event = new StubEventPayload({ size: 42 });
 
-		dispatcher.register(handler);
-		expect(dispatcher.dispatch(event)).toBe(true);
-		expect(handleFn).toHaveBeenCalledTimes(1);
-		expect(handleFn).toHaveBeenCalledWith(event);
+			dispatcher.register(handleOneFn);
+			const response = await dispatcher.dispatch(event);
+			expect(response).toStrictEqual([{ status: 'fulfilled', value: true }]);
+			expect(handleOneFn).toHaveBeenCalledTimes(1);
+			expect(handleOneFn).toHaveBeenCalledWith(event);
+		});
+
+		it('should unregister all handlers', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			dispatcher.register(stubEventHandlerCallback);
+			dispatcher.register(anotherStubEventHandlerCallback);
+			expect(dispatcher.handlers.length).toBe(2);
+
+			expect(dispatcher.unregisterAll()).toBe(true);
+			expect(dispatcher.handlers.length).toBe(0);
+		});
 	});
 });

@@ -1,30 +1,36 @@
-import EventHandler from '@/core/EventHandler';
+import { EventHandlerCallback } from '@/core/types';
 import EventPayload from '@/core/EventPayload';
 
 export type StubEventData = {
-	value: number;
+	size: number;
+};
+
+export type AnotherStubEventData = {
+	amount: number;
 };
 
 export class StubEventPayload extends EventPayload<StubEventData> {
-	constructor(data: { value: number }) {
+	constructor(data: StubEventData) {
 		super('STUB_EVENT', data);
 	}
 }
 
-export class AnotherStubEventPayload extends EventPayload<StubEventData> {
-	constructor(data: { value: number }) {
+export class AnotherStubEventPayload extends EventPayload<AnotherStubEventData> {
+	constructor(data: AnotherStubEventData) {
 		super('ANOTHER_STUB_EVENT', data);
 	}
 }
 
-export class StubEventHandler extends EventHandler<StubEventData> {
-	public handle(event: StubEventPayload): void {
-		console.log(event);
-	}
-}
+export const stubEventHandlerCallback: EventHandlerCallback<
+	StubEventPayload
+> = event => {
+	console.log(event);
+	return true;
+};
 
-export class AnotherStubEventHandler extends EventHandler<StubEventData> {
-	public handle(event: EventPayload<StubEventData>): void {
-		console.log(event);
-	}
-}
+export const anotherStubEventHandlerCallback: EventHandlerCallback<
+	AnotherStubEventPayload
+> = event => {
+	console.log(event);
+	return true;
+};

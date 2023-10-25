@@ -1,6 +1,6 @@
 {
 	"name": "@piggly/event-bus",
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"description": "An ESM/CommonJS library following Oriented-Object Programming pattern to manager an Event Bus.",
 	"scripts": {
 		"check": "tsc --noEmit",
