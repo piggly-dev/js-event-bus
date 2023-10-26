@@ -8,6 +8,16 @@ describe('LocalEventDriver', () => {
 		driver.set('STUB_EVENT', dispatcher);
 		expect(driver.get('STUB_EVENT')).toBe(dispatcher);
 		expect(driver.has('STUB_EVENT')).toBe(true);
+		expect(driver.size()).toBe(1);
+	});
+
+	it('should not set a existing dispatcher', () => {
+		const driver = new LocalEventDriver();
+		const dispatcher = new EventDispatcher('STUB_EVENT');
+
+		driver.set('STUB_EVENT', dispatcher);
+		driver.set('STUB_EVENT', dispatcher);
+		expect(driver.size()).toBe(1);
 	});
 
 	it('should get a dispatcher', () => {

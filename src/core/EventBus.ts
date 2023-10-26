@@ -1,8 +1,12 @@
 import EventDispatcher from './EventDispatcher';
-import EventHandler from './EventHandler';
 import EventPayload from './EventPayload';
 import LocalEventDriver from './drivers/LocalEventDriver';
-import { EventBusOptions, EventDriverInterface } from './types';
+import {
+	EventBusOptions,
+	EventDispatcherResponse,
+	EventDriverInterface,
+	EventHandler,
+} from './types';
 
 /**
  * @file Event bus to subscribe, unsubscribe and publish events.
@@ -30,7 +34,7 @@ export default class EventBus {
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	private _driver: Map<string, EventDriverInterface>;
+	private _drivers: Map<string, EventDriverInterface>;
 
 	/**
 	 * Construct with default driver.
@@ -42,7 +46,7 @@ export default class EventBus {
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	private constructor() {
-		this._driver = new Map();
+		this._drivers = new Map();
 		this.register(new LocalEventDriver());
 	}
 
@@ -75,7 +79,7 @@ export default class EventBus {
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public register(driver: EventDriverInterface): void {
-		this._driver.set(driver.name, driver);
+		this._drivers.set(driver.name, driver);
 	}
 
 	/**
@@ -89,15 +93,15 @@ export default class EventBus {
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public publish<Event extends EventPayload>(
+	public async publish<Event extends EventPayload>(
 		event: Event,
 		options?: EventBusOptions
-	): boolean {
+	): Promise<EventDispatcherResponse> {
 		const driver = this.driver(options);
 		const dispatcher = driver.get(event.name);
 
 		if (dispatcher === undefined) {
-			return false;
+			return undefined;
 		}
 
 		return dispatcher.dispatch<Event>(event);
@@ -115,9 +119,9 @@ export default class EventBus {
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public subscribe(
+	public subscribe<Event extends EventPayload>(
 		event_name: string,
-		handler: EventHandler,
+		handler: EventHandler<Event>,
 		options?: EventBusOptions
 	): boolean {
 		const driver = this.driver(options);
@@ -143,9 +147,9 @@ export default class EventBus {
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public unsubscribe(
+	public unsubscribe<Event extends EventPayload>(
 		event_name: string,
-		handler: EventHandler,
+		handler: EventHandler<Event>,
 		options?: EventBusOptions
 	): boolean {
 		const driver = this.driver(options);
@@ -192,10 +196,10 @@ export default class EventBus {
 	 */
 	protected driver(options?: EventBusOptions): EventDriverInterface {
 		if (options === undefined || options.driver === undefined) {
-			return this._driver.get('local') as EventDriverInterface;
+			return this._drivers.get('local') as EventDriverInterface;
 		}
 
-		const driver = this._driver.get(options.driver);
+		const driver = this._drivers.get(options.driver);
 
 		if (driver === undefined) {
 			throw new Error(`EventBus driver ${options.driver} not found.`);
