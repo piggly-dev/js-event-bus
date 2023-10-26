@@ -1,6 +1,10 @@
 import { EventDispatcher, LocalEventDriver } from '@/core';
 import EventBus from '@/index';
-import { StubEventPayload, stubEventHandlerCallback } from '@test/__stubs__';
+import {
+	CustomEventDriver,
+	StubEventPayload,
+	stubEventHandlerCallback,
+} from '@test/__stubs__';
 
 describe('EventBus', () => {
 	it('should have a singleton instance', () => {
@@ -110,5 +114,20 @@ describe('EventBus', () => {
 
 		expect(EventBus.instance.publish(payload)).resolves.toStrictEqual([true]);
 		expect(dispatchFn).toHaveBeenCalledWith(payload);
+	});
+
+	it('should throw an error for non existing driver', () => {
+		expect(() => {
+			EventBus.instance.unsubscribeAll('ANY_EVENT', { driver: 'unknown' });
+		}).toThrow('EventBus driver unknown not found.');
+	});
+
+	it('should handle an existing driver', () => {
+		EventBus.instance.register(new CustomEventDriver());
+
+		// Return false because there is nothing to unsubscribe
+		expect(
+			EventBus.instance.unsubscribeAll('ANY_EVENT', { driver: 'custom' })
+		).toBe(false);
 	});
 });

@@ -6,6 +6,7 @@ export interface EventDriverInterface {
 	set(event_name: string, dispatcher: EventDispatcher): void;
 	get(event_name: string): EventDispatcher | undefined;
 	has(event_name: string): boolean;
+	size(): number;
 }
 
 export type EventBusOptions = {

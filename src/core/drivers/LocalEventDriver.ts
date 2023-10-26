@@ -89,4 +89,17 @@ export default class LocalEventDriver implements EventDriverInterface {
 	public has(event_name: string): boolean {
 		return this.dispatchers.has(event_name);
 	}
+
+	/**
+	 * Get dispatchers size.
+	 *
+	 * @returns {number}
+	 * @public
+	 * @since 2.0.0
+	 * @memberof LocalEventDriver
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public size(): number {
+		return this.dispatchers.size;
+	}
 }

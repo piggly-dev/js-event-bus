@@ -67,7 +67,15 @@ export default class EventDispatcher {
 			return undefined;
 		}
 
-		return Promise.allSettled(this.handlers.map(handler => handler(event)));
+		return Promise.allSettled(
+			this.handlers.map(handler => {
+				try {
+					return handler(event);
+				} catch (err: any) {
+					return Promise.reject(err);
+				}
+			})
+		);
 	}
 
 	/**

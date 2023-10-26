@@ -136,6 +136,10 @@ const syncHandler = async (e: StubEventPayload) => {
 };
 ```
 
+## Examples
+
+See [EventBus.integration.spec.ts](./test/core/EventBus.integration.spec.ts) file for more examples.
+
 ## Changelog
 
 See the [CHANGELOG](CHANGELOG.md) file for information about all code changes.

@@ -8,7 +8,7 @@
 
 - [Fix] Export `EventPayload` as `EventPayload` instead `Event`.
 
-## 2.0.0 at `2023-10-25`
+## 2.0.0 at `2023-10-26`
 
 - Handlers are now regular functions;
 - Handlers can be async/await functions or return a Promise;

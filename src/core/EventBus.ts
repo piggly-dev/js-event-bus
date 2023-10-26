@@ -5,7 +5,7 @@ import {
 	EventBusOptions,
 	EventDispatcherResponse,
 	EventDriverInterface,
-	EventHandlerCallback,
+	EventHandler,
 } from './types';
 
 /**
@@ -121,7 +121,7 @@ export default class EventBus {
 	 */
 	public subscribe<Event extends EventPayload>(
 		event_name: string,
-		handler: EventHandlerCallback<Event>,
+		handler: EventHandler<Event>,
 		options?: EventBusOptions
 	): boolean {
 		const driver = this.driver(options);
@@ -149,7 +149,7 @@ export default class EventBus {
 	 */
 	public unsubscribe<Event extends EventPayload>(
 		event_name: string,
-		handler: EventHandlerCallback<Event>,
+		handler: EventHandler<Event>,
 		options?: EventBusOptions
 	): boolean {
 		const driver = this.driver(options);

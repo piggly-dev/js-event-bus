@@ -1,5 +1,6 @@
-import { EventHandlerCallback } from '@/core/types';
+import { EventDriverInterface, EventHandlerCallback } from '@/core/types';
 import EventPayload from '@/core/EventPayload';
+import { EventDispatcher } from '@/core';
 
 export type StubEventData = {
 	size: number;
@@ -34,3 +35,32 @@ export const anotherStubEventHandlerCallback: EventHandlerCallback<
 	console.log(event);
 	return true;
 };
+export class CustomEventDriver implements EventDriverInterface {
+	public readonly name: string = 'custom';
+
+	private readonly dispatchers: Map<string, EventDispatcher>;
+
+	constructor() {
+		this.dispatchers = new Map();
+	}
+
+	public set(event_name: string, dispatcher: EventDispatcher): void {
+		if (this.has(event_name)) {
+			return;
+		}
+
+		this.dispatchers.set(event_name, dispatcher);
+	}
+
+	public get(event_name: string): EventDispatcher | undefined {
+		return this.dispatchers.get(event_name);
+	}
+
+	public has(event_name: string): boolean {
+		return this.dispatchers.has(event_name);
+	}
+
+	public size(): number {
+		return this.dispatchers.size;
+	}
+}

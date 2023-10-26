@@ -103,5 +103,10 @@ describe('EventDispatcher', () => {
 			expect(dispatcher.unregisterAll()).toBe(true);
 			expect(dispatcher.handlers.length).toBe(0);
 		});
+
+		it('should unregister all handlers <- return false when empty handlers', () => {
+			const dispatcher = new EventDispatcher('STUB_EVENT');
+			expect(dispatcher.unregisterAll()).toBe(false);
+		});
 	});
 });
