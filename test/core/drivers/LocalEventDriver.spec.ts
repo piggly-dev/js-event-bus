@@ -1,4 +1,4 @@
-import { EventDispatcher, LocalEventDriver } from '@/core';
+import { EventDispatcher, LocalEventDriver } from '@/index';
 
 describe('LocalEventDriver', () => {
 	it('should set a dispatcher', () => {

@@ -3,7 +3,8 @@
 		"target": "esnext",
 		"module": "commonjs",
 		"strict": true,
-		"declaration": true,
+		"declaration": false,
+		"emitDeclarationOnly": false,
 		"noUnusedLocals": true,
 		"noUnusedParameters": false,
 		"importHelpers": true,
@@ -31,5 +32,8 @@
 		"types": ["node"]
 	},
 	"include": ["./src/**/*"],
-	"exclude": ["./node_modules/**/*", "./build/**/*", "./test/**/*"]
+	"exclude": ["./node_modules/**/*", "./build/**/*", "./test/**/*"],
+	"tsc-alias": {
+		"resolveFullPaths": true
+	}
 }

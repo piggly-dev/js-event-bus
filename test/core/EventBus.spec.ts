@@ -1,4 +1,4 @@
-import { EventDispatcher, LocalEventDriver } from '@/core';
+import { EventDispatcher, LocalEventDriver } from '@/index';
 import EventBus from '@/index';
 import {
 	CustomEventDriver,

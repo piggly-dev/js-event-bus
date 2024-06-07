@@ -1,6 +1,6 @@
 import { EventDriverInterface, EventHandlerCallback } from '@/core/types';
-import EventPayload from '@/core/EventPayload';
-import { EventDispatcher } from '@/core';
+import { EventPayload } from '@/core/EventPayload';
+import { EventDispatcher } from '@/index';
 
 export type StubEventData = {
 	size: number;

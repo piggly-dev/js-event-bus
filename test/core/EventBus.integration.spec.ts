@@ -1,4 +1,4 @@
-import { EventPayload } from '@/core';
+import { EventPayload } from '@/index';
 import EventBus from '@/index';
 
 type CLIENT_CREATED_EVENT_DATA = {
