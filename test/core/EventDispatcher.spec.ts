@@ -1,4 +1,4 @@
-import { EventDispatcher } from '@/core';
+import { EventDispatcher } from '@/index';
 import {
 	AnotherStubEventPayload,
 	StubEventPayload,

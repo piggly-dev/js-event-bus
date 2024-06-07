@@ -17,3 +17,7 @@
 ## 2.1.0 at `2024-06-01`
 
 - Export as ESM module named.
+
+## 2.1.1 at `2024-06-01`
+
+- [Fix] ESM/CommonJS/Types compatibility.

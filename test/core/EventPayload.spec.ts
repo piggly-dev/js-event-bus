@@ -1,4 +1,4 @@
-import EventPayload from '@/core/EventPayload';
+import { EventPayload } from '@/core/EventPayload';
 import * as uuid from 'uuid';
 
 jest.mock('uuid');

@@ -4,6 +4,7 @@
 		"module": "esnext",
 		"strict": true,
 		"declaration": true,
+		"emitDeclarationOnly": true,
 		"noUnusedLocals": true,
 		"noUnusedParameters": false,
 		"importHelpers": true,
@@ -15,11 +16,10 @@
 		"allowJs": false,
 		"resolveJsonModule": true,
 		"baseUrl": ".",
-		"rootDir": ".",
-		"outDir": "./dist/esm",
+		"rootDir": "./src",
+		"outDir": "./dist/types",
 		"paths": {
-			"@/*": ["src/*"],
-			"@test/*": ["test/*"]
+			"@/*": ["src/*"]
 		},
 		"plugins": [
 			{
@@ -29,11 +29,8 @@
 		],
 		"lib": ["esnext"],
 		"typeRoots": ["<rootDir>/src/types", "node_modules/@types"],
-		"types": ["node", "jest"]
+		"types": ["node"]
 	},
-	"include": ["./src/**/*", "./debug/**/*", "./test/**/*"],
-	"exclude": ["./node_modules/**/*", "./build/**/*"],
-	"tsc-alias": {
-		"resolveFullPaths": true
-	}
+	"include": ["./src/**/*"],
+	"exclude": ["./node_modules/**/*", "./build/**/*", "./test/**/*"]
 }
