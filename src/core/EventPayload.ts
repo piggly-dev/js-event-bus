@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 /**
  * Event payload with data.
  */
-export default class EventPayload<
+export class EventPayload<
 	EventData extends Record<string, any> = Record<string, any>
 > {
 	/**

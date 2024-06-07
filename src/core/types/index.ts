@@ -1,5 +1,5 @@
-import type EventDispatcher from '../EventDispatcher';
-import type EventPayload from '../EventPayload';
+import type { EventDispatcher } from '../EventDispatcher';
+import type { EventPayload } from '../EventPayload';
 
 export interface EventDriverInterface {
 	readonly name: string;

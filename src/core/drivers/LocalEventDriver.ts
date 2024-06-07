@@ -1,11 +1,11 @@
-import EventDispatcher from '../EventDispatcher';
+import { EventDispatcher } from '../EventDispatcher';
 import { EventDriverInterface } from '../types';
 
 /**
  * @file Local event driver using map for dispatchers.
  * @copyright Piggly Lab 2023
  */
-export default class LocalEventDriver implements EventDriverInterface {
+export class LocalEventDriver implements EventDriverInterface {
 	/**
 	 * Driver name.
 	 *

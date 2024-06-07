@@ -1,4 +1,4 @@
-import EventBus from './core/EventBus';
+import { EventBus } from './core/EventBus';
 
 /**
  * Event bus library.
@@ -9,5 +9,17 @@ import EventBus from './core/EventBus';
  * @author Caique Araujo <caique@piggly.com.br>
  * @version 1.0.0
  */
-export * from './core';
+export { EventPayload, EventDispatcher, LocalEventDriver } from './core';
+
+export type {
+	EventDriverInterface,
+	EventBusOptions,
+	EventDispatcherResponse,
+	EventHandlerCallback,
+	AsyncEventHandlerCallback,
+	EventHandler,
+} from './core/types';
+
+export { EventBus };
+
 export default EventBus;
