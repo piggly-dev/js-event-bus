@@ -13,3 +13,7 @@
 - Handlers are now regular functions;
 - Handlers can be async/await functions or return a Promise;
 - Handlers can be a `EventHandlerCallback` or `AsyncEventHandlerCallback` type.
+
+## 2.1.0 at `2024-06-01`
+
+- Export as ESM module named.

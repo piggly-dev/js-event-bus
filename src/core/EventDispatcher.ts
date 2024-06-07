@@ -1,4 +1,4 @@
-import EventPayload from './EventPayload';
+import { EventPayload } from './EventPayload';
 
 import type { EventDispatcherResponse, EventHandler } from './types';
 
@@ -6,7 +6,7 @@ import type { EventDispatcherResponse, EventHandler } from './types';
  * @file Event dispatcher, where you can register handlers to an unique event and dispatch to them.
  * @copyright Piggly Lab 2023
  */
-export default class EventDispatcher {
+export class EventDispatcher {
 	/**
 	 * Handlers.
 	 *

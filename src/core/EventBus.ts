@@ -1,6 +1,6 @@
-import EventDispatcher from './EventDispatcher';
-import EventPayload from './EventPayload';
-import LocalEventDriver from './drivers/LocalEventDriver';
+import { EventDispatcher } from './EventDispatcher';
+import { EventPayload } from './EventPayload';
+import { LocalEventDriver } from './drivers/LocalEventDriver';
 import {
 	EventBusOptions,
 	EventDispatcherResponse,
@@ -12,7 +12,7 @@ import {
  * @file Event bus to subscribe, unsubscribe and publish events.
  * @copyright Piggly Lab 2023
  */
-export default class EventBus {
+export class EventBus {
 	/**
 	 * Singleton instance.
 	 *
