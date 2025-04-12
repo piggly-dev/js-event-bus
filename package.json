@@ -56,7 +56,6 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^29.5.12",
-		"@types/uuid": "^9.0.8",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
 		"@zerollup/ts-transform-paths": "^1.7.18",
@@ -76,8 +75,5 @@
 		"tsc-alias": "^1.8.10",
 		"tslib": "^2.6.3",
 		"typescript": "^4.9.5"
-	},
-	"dependencies": {
-		"uuid": "^9.0.1"
 	}
 }
