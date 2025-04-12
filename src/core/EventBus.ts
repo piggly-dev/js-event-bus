@@ -37,16 +37,29 @@ export class EventBus {
 	private _drivers: Map<string, EventDriverInterface>;
 
 	/**
+	 * Ongoing promises.
+	 *
+	 * @type {Set<Promise<EventDispatcherResponse>>}
+	 * @private
+	 * @since 2.2.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	private _ongoing: Set<Promise<EventDispatcherResponse>>;
+
+	/**
 	 * Construct with default driver.
 	 *
 	 * @constructor
 	 * @private
 	 * @since 1.0.0
+	 * @since 2.2.0 Added promise tracking.
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	private constructor() {
 		this._drivers = new Map();
+		this._ongoing = new Set();
 		this.register(new LocalEventDriver());
 	}
 
@@ -90,6 +103,7 @@ export class EventBus {
 	 * @returns {boolean}
 	 * @public
 	 * @since 1.0.0
+	 * @since 2.2.0 Added promise tracking.
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
@@ -104,7 +118,19 @@ export class EventBus {
 			return undefined;
 		}
 
-		return dispatcher.dispatch<Event>(event);
+		const promise = dispatcher.dispatch<Event>(event);
+
+		if (promise === undefined) {
+			return undefined;
+		}
+
+		promise.finally(() => {
+			this._ongoing.delete(promise);
+		});
+
+		this._ongoing.add(promise);
+
+		return promise;
 	}
 
 	/**
@@ -182,6 +208,23 @@ export class EventBus {
 		}
 
 		return dispatcher.unregisterAll();
+	}
+
+	/**
+	 * The cleanup method will:
+	 *
+	 * - Remove all pending promises.
+	 *
+	 * @returns {Promise<void>}
+	 * @public
+	 * @since 2.2.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public async cleanup(): Promise<void> {
+		await Promise.allSettled(Array.from(this._ongoing));
+
+		this._ongoing.clear();
 	}
 
 	/**
