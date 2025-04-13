@@ -43,7 +43,7 @@ export class EventBus {
 	 *
 	 * @type {Set<Promise<EventDispatcherResponse>>}
 	 * @private
-	 * @since 2.2.0
+	 * @since 3.0.0
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
@@ -55,7 +55,7 @@ export class EventBus {
 	 * @constructor
 	 * @private
 	 * @since 1.0.0
-	 * @since 2.2.0 Added promise tracking.
+	 * @since 3.0.0 Added promise tracking.
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
@@ -88,7 +88,7 @@ export class EventBus {
 	 *
 	 * @returns {number}
 	 * @public
-	 * @since 2.2.0
+	 * @since 3.0.0
 	 * @memberof EventBus
 	 */
 	public get ongoing(): number {
@@ -109,7 +109,7 @@ export class EventBus {
 	 *
 	 * @returns {Promise<void>}
 	 * @public
-	 * @since 2.2.0
+	 * @since 3.0.0
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
@@ -175,13 +175,14 @@ export class EventBus {
 	 *      memory usage if you have a lot of events to wait.
 	 *
 	 * @important Be careful when using wait_onclean, it will hold promises on memory till they are settled.
+	 * @experimental This feature is experimental and may change in the future.
 	 * @param {Event} event Event payload object.
 	 * @param {boolean} wait_onclean If true, the event will be sent as wait_onclean.
 	 * @param {EventBusOptions} options With driver name.
 	 * @returns {void}
 	 * @public
 	 * @since 1.0.0
-	 * @since 2.2.0 Added promise tracking.
+	 * @since 3.0.0 Added promise tracking.
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */

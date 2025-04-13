@@ -1,6 +1,6 @@
 {
 	"name": "@piggly/event-bus",
-	"version": "2.1.2",
+	"version": "3.0.0",
 	"description": "An ESM/CommonJS library following Oriented-Object Programming pattern to manager an Event Bus.",
 	"scripts": {
 		"clean": "rimraf dist",

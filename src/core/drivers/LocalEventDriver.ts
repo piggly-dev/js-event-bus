@@ -13,7 +13,7 @@ export class LocalEventDriver implements EventDriverInterface {
 	 *
 	 * @type {(error: Error) => void}
 	 * @public
-	 * @since 2.2.0
+	 * @since 3.0.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
@@ -62,7 +62,7 @@ export class LocalEventDriver implements EventDriverInterface {
 	 * @param {Error} error Error object.
 	 * @returns {void}
 	 * @public
-	 * @since 2.2.0
+	 * @since 3.0.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
@@ -108,7 +108,7 @@ export class LocalEventDriver implements EventDriverInterface {
 	 * @param {Error} error Error object.
 	 * @returns {void}
 	 * @public
-	 * @since 2.2.0
+	 * @since 3.0.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
