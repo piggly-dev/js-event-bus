@@ -133,7 +133,7 @@ export class EventBus {
 	 */
 	public async publish<Event extends EventPayload>(
 		event: Event,
-		options?: EventBusOptions
+		options?: EventBusOptions,
 	): Promise<EventDispatcherResponse> {
 		const driver = this.driver(options);
 		const dispatcher = driver.get(event.name);
@@ -189,7 +189,7 @@ export class EventBus {
 	public send<Event extends EventPayload>(
 		event: Event,
 		wait_onclean: boolean = false,
-		options?: EventBusOptions
+		options?: EventBusOptions,
 	): void {
 		const driver = this.driver(options);
 		const dispatcher = driver.get(event.name);
@@ -224,7 +224,7 @@ export class EventBus {
 			this._ongoing.delete(promise);
 
 			debug('eventbus:publish')(
-				`send.removed ${event.name}; pool: ${this._ongoing.size}`
+				`send.removed ${event.name}; pool: ${this._ongoing.size}`,
 			);
 		};
 
@@ -257,7 +257,7 @@ export class EventBus {
 	public subscribe<Event extends EventPayload>(
 		event_name: string,
 		handler: EventHandler<Event>,
-		options?: EventBusOptions
+		options?: EventBusOptions,
 	): boolean {
 		const driver = this.driver(options);
 		let dispatcher = driver.get(event_name);
@@ -285,7 +285,7 @@ export class EventBus {
 	public unsubscribe<Event extends EventPayload>(
 		event_name: string,
 		handler: EventHandler<Event>,
-		options?: EventBusOptions
+		options?: EventBusOptions,
 	): boolean {
 		const driver = this.driver(options);
 		const dispatcher = driver.get(event_name);
