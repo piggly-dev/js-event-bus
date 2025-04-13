@@ -128,13 +128,13 @@ export class EventBus {
 	 * It will not wait for the event to be processed. But:
 	 *
 	 * - When error callback is set on driver, it will be called when something goes wrong.
-	 * - When critical is true, the event will be added to the pool.
+	 * - When wait_onclean is true, the event will be added to the pool.
 	 *   a) Later, you may use cleanup method to wait for all pending promises on pool.
-	 *   b) Will be useful for critical events that must be processed and waited to finish.
+	 *   b) Will be useful for wait_onclean events that must be processed and waited to finish.
 	 *   c) In a graceful shutdown, for example.
 	 *
 	 * @param {Event} event Event payload object.
-	 * @param {boolean} critical If true, the event will be sent as critical.
+	 * @param {boolean} wait_onclean If true, the event will be sent as wait_onclean.
 	 * @param {EventBusOptions} options With driver name.
 	 * @returns {void}
 	 * @public
@@ -145,7 +145,7 @@ export class EventBus {
 	 */
 	public send<Event extends EventPayload>(
 		event: Event,
-		critical = false,
+		wait_onclean = false,
 		options?: EventBusOptions
 	): void {
 		const driver = this.driver(options);
@@ -155,7 +155,7 @@ export class EventBus {
 			return;
 		}
 
-		if (critical === false) {
+		if (wait_onclean === false) {
 			dispatcher
 				.dispatch<Event>(event)
 				.then(e => {
