@@ -1,35 +1,11 @@
-import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 /**
  * Event payload with data.
  */
 export class EventPayload<
-	EventData extends Record<string, any> = Record<string, any>
+	EventData extends Record<string, any> = Record<string, any>,
 > {
-	/**
-	 * Event id.
-	 *
-	 * @type {string}
-	 * @public
-	 * @readonly
-	 * @since 1.0.0
-	 * @memberof EventPayload
-	 * @author Caique Araujo <caique@piggly.com.br>
-	 */
-	public readonly id: string;
-
-	/**
-	 * Event name.
-	 *
-	 * @type {string}
-	 * @public
-	 * @readonly
-	 * @since 1.0.0
-	 * @memberof EventPayload
-	 * @author Caique Araujo <caique@piggly.com.br>
-	 */
-	public readonly name: string;
-
 	/**
 	 * Event data, where EventData may be an object.
 	 *
@@ -43,6 +19,18 @@ export class EventPayload<
 	public readonly data: EventData;
 
 	/**
+	 * Event id.
+	 *
+	 * @type {string}
+	 * @public
+	 * @readonly
+	 * @since 1.0.0
+	 * @memberof EventPayload
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public readonly id: string;
+
+	/**
 	 * Event issued at timestamp.
 	 *
 	 * @type {number}
@@ -53,6 +41,18 @@ export class EventPayload<
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public readonly issued_at: number;
+
+	/**
+	 * Event name.
+	 *
+	 * @type {string}
+	 * @public
+	 * @readonly
+	 * @since 1.0.0
+	 * @memberof EventPayload
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public readonly name: string;
 
 	/**
 	 * Constructor with event name and data.
@@ -83,6 +83,6 @@ export class EventPayload<
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public generateId(): string {
-		return uuidv4();
+		return crypto.randomUUID();
 	}
 }

@@ -1,12 +1,15 @@
 import { EventPayload } from '@/core/EventPayload';
-import * as uuid from 'uuid';
+import * as crypto from 'crypto';
 
-jest.mock('uuid');
+jest.mock('crypto');
 
 describe('EventPayload', () => {
 	it('should have all attributes as expected', () => {
 		jest.spyOn(Date, 'now').mockReturnValue(1685329292785);
-		jest.spyOn(uuid, 'v4').mockReturnValue('65d83807-3dfc-4e6e-8c0f-8446e825ae34');
+
+		jest
+			.spyOn(crypto, 'randomUUID')
+			.mockReturnValue('65d83807-3dfc-4e6e-8c0f-8446e825ae34');
 
 		const event = new EventPayload<{
 			value: number;

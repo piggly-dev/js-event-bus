@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 import { EventDispatcher } from '../EventDispatcher';
 import { EventDriverInterface } from '../types';
 
@@ -7,16 +9,15 @@ import { EventDriverInterface } from '../types';
  */
 export class LocalEventDriver implements EventDriverInterface {
 	/**
-	 * Driver name.
+	 * On error callback.
 	 *
-	 * @type {string}
+	 * @type {(error: Error) => void}
 	 * @public
-	 * @readonly
-	 * @since 1.0.0
+	 * @since 3.0.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public readonly name: string = 'local';
+	private _onError?: (error: Error) => void;
 
 	/**
 	 * Dispatchers, where key is event name and value is dispatcher.
@@ -29,6 +30,18 @@ export class LocalEventDriver implements EventDriverInterface {
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	private readonly dispatchers: Map<string, EventDispatcher>;
+
+	/**
+	 * Driver name.
+	 *
+	 * @type {string}
+	 * @public
+	 * @readonly
+	 * @since 1.0.0
+	 * @memberof LocalEventDriver
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public readonly name: string = 'local';
 
 	/**
 	 * Constructor with empty dispatchers.
@@ -44,22 +57,21 @@ export class LocalEventDriver implements EventDriverInterface {
 	}
 
 	/**
-	 * Set dispatcher for event name.
+	 * Set on error callback.
 	 *
-	 * @param {string} event_name
-	 * @param {EventDispatcher} dispatcher Event dispatcher object.
+	 * @param {Error} error Error object.
 	 * @returns {void}
 	 * @public
-	 * @since 1.0.0
+	 * @since 3.0.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public set(event_name: string, dispatcher: EventDispatcher): void {
-		if (this.has(event_name)) {
-			return;
-		}
+	public error(error: Error): void {
+		debug('eventbus:error')(error.message, error);
 
-		this.dispatchers.set(event_name, dispatcher);
+		if (this._onError) {
+			this._onError(error);
+		}
 	}
 
 	/**
@@ -88,6 +100,39 @@ export class LocalEventDriver implements EventDriverInterface {
 	 */
 	public has(event_name: string): boolean {
 		return this.dispatchers.has(event_name);
+	}
+
+	/**
+	 * Set a callback to handle errors.
+	 *
+	 * @param {Error} error Error object.
+	 * @returns {void}
+	 * @public
+	 * @since 3.0.0
+	 * @memberof LocalEventDriver
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public onError(callback: (error: Error) => void): void {
+		this._onError = callback;
+	}
+
+	/**
+	 * Set dispatcher for event name.
+	 *
+	 * @param {string} event_name
+	 * @param {EventDispatcher} dispatcher Event dispatcher object.
+	 * @returns {void}
+	 * @public
+	 * @since 1.0.0
+	 * @memberof LocalEventDriver
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public set(event_name: string, dispatcher: EventDispatcher): void {
+		if (this.has(event_name)) {
+			return;
+		}
+
+		this.dispatchers.set(event_name, dispatcher);
 	}
 
 	/**
