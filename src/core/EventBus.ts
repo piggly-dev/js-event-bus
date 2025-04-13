@@ -1,14 +1,14 @@
 import debug from 'debug';
 
-import { EventDispatcher } from './EventDispatcher';
-import { EventPayload } from './EventPayload';
-import { LocalEventDriver } from './drivers/LocalEventDriver';
 import {
-	EventBusOptions,
 	EventDispatcherResponse,
 	EventDriverInterface,
+	EventBusOptions,
 	EventHandler,
 } from './types';
+import { LocalEventDriver } from './drivers/LocalEventDriver';
+import { EventDispatcher } from './EventDispatcher';
+import { EventPayload } from './EventPayload';
 
 /**
  * @file Event bus to subscribe, unsubscribe and publish events.
@@ -84,17 +84,40 @@ export class EventBus {
 	}
 
 	/**
-	 * Register a new driver for event bus.
+	 * Get the number of ongoing promises.
 	 *
-	 * @param {EventDriverInterface} driver Event driver object.
-	 * @returns {void}
+	 * @returns {number}
 	 * @public
-	 * @since 1.0.0
+	 * @since 2.2.0
+	 * @memberof EventBus
+	 */
+	public get ongoing(): number {
+		return this._ongoing.size;
+	}
+
+	/**
+	 * The cleanup method will:
+	 *
+	 * - Wait for all pending promises triggered by send method.
+	 * - Clear the pool of pending promises.
+	 *
+	 * Useful for:
+	 *
+	 * - Flush pool of pending promises.
+	 * - Ensure all promises are settled.
+	 * - Gracefully shutdown your application.
+	 *
+	 * @returns {Promise<void>}
+	 * @public
+	 * @since 2.2.0
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public register(driver: EventDriverInterface): void {
-		this._drivers.set(driver.name, driver);
+	public async cleanup(): Promise<void> {
+		debug('eventbus:cleanup')('cleaning up');
+		await Promise.allSettled(this._ongoing);
+		this._ongoing = new Set();
+		debug('eventbus:cleanup')('cleaned up');
 	}
 
 	/**
@@ -121,6 +144,20 @@ export class EventBus {
 
 		debug('eventbus:publish')(`published ${event.name}`);
 		return dispatcher.dispatch<Event>(event);
+	}
+
+	/**
+	 * Register a new driver for event bus.
+	 *
+	 * @param {EventDriverInterface} driver Event driver object.
+	 * @returns {void}
+	 * @public
+	 * @since 1.0.0
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public register(driver: EventDriverInterface): void {
+		this._drivers.set(driver.name, driver);
 	}
 
 	/**
@@ -277,31 +314,6 @@ export class EventBus {
 	}
 
 	/**
-	 * The cleanup method will:
-	 *
-	 * - Wait for all pending promises triggered by send method.
-	 * - Clear the pool of pending promises.
-	 *
-	 * Useful for:
-	 *
-	 * - Flush pool of pending promises.
-	 * - Ensure all promises are settled.
-	 * - Gracefully shutdown your application.
-	 *
-	 * @returns {Promise<void>}
-	 * @public
-	 * @since 2.2.0
-	 * @memberof EventBus
-	 * @author Caique Araujo <caique@piggly.com.br>
-	 */
-	public async cleanup(): Promise<void> {
-		debug('eventbus:cleanup')('cleaning up');
-		await Promise.allSettled(this._ongoing);
-		this._ongoing = new Set();
-		debug('eventbus:cleanup')('cleaned up');
-	}
-
-	/**
 	 * Get driver instance.
 	 *
 	 * @param {EventBusOptions} options
@@ -324,17 +336,5 @@ export class EventBus {
 		}
 
 		return driver;
-	}
-
-	/**
-	 * Get the number of ongoing promises.
-	 *
-	 * @returns {number}
-	 * @public
-	 * @since 2.2.0
-	 * @memberof EventBus
-	 */
-	public get ongoing(): number {
-		return this._ongoing.size;
 	}
 }

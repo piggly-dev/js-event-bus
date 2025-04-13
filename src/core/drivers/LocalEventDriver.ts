@@ -1,4 +1,5 @@
 import debug from 'debug';
+
 import { EventDispatcher } from '../EventDispatcher';
 import { EventDriverInterface } from '../types';
 
@@ -8,16 +9,15 @@ import { EventDriverInterface } from '../types';
  */
 export class LocalEventDriver implements EventDriverInterface {
 	/**
-	 * Driver name.
+	 * On error callback.
 	 *
-	 * @type {string}
+	 * @type {(error: Error) => void}
 	 * @public
-	 * @readonly
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public readonly name: string = 'local';
+	private _onError?: (error: Error) => void;
 
 	/**
 	 * Dispatchers, where key is event name and value is dispatcher.
@@ -32,15 +32,16 @@ export class LocalEventDriver implements EventDriverInterface {
 	private readonly dispatchers: Map<string, EventDispatcher>;
 
 	/**
-	 * On error callback.
+	 * Driver name.
 	 *
-	 * @type {(error: Error) => void}
+	 * @type {string}
 	 * @public
-	 * @since 2.2.0
+	 * @readonly
+	 * @since 1.0.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	private _onError?: (error: Error) => void;
+	public readonly name: string = 'local';
 
 	/**
 	 * Constructor with empty dispatchers.
@@ -56,22 +57,21 @@ export class LocalEventDriver implements EventDriverInterface {
 	}
 
 	/**
-	 * Set dispatcher for event name.
+	 * Set on error callback.
 	 *
-	 * @param {string} event_name
-	 * @param {EventDispatcher} dispatcher Event dispatcher object.
+	 * @param {Error} error Error object.
 	 * @returns {void}
 	 * @public
-	 * @since 1.0.0
+	 * @since 2.2.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public set(event_name: string, dispatcher: EventDispatcher): void {
-		if (this.has(event_name)) {
-			return;
-		}
+	public error(error: Error): void {
+		debug('eventbus:error')(error.message, error);
 
-		this.dispatchers.set(event_name, dispatcher);
+		if (this._onError) {
+			this._onError(error);
+		}
 	}
 
 	/**
@@ -103,19 +103,6 @@ export class LocalEventDriver implements EventDriverInterface {
 	}
 
 	/**
-	 * Get dispatchers size.
-	 *
-	 * @returns {number}
-	 * @public
-	 * @since 2.0.0
-	 * @memberof LocalEventDriver
-	 * @author Caique Araujo <caique@piggly.com.br>
-	 */
-	public size(): number {
-		return this.dispatchers.size;
-	}
-
-	/**
 	 * Set a callback to handle errors.
 	 *
 	 * @param {Error} error Error object.
@@ -130,20 +117,34 @@ export class LocalEventDriver implements EventDriverInterface {
 	}
 
 	/**
-	 * Set on error callback.
+	 * Set dispatcher for event name.
 	 *
-	 * @param {Error} error Error object.
+	 * @param {string} event_name
+	 * @param {EventDispatcher} dispatcher Event dispatcher object.
 	 * @returns {void}
 	 * @public
-	 * @since 2.2.0
+	 * @since 1.0.0
 	 * @memberof LocalEventDriver
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public error(error: Error): void {
-		debug('eventbus:error')(error.message, error);
-
-		if (this._onError) {
-			this._onError(error);
+	public set(event_name: string, dispatcher: EventDispatcher): void {
+		if (this.has(event_name)) {
+			return;
 		}
+
+		this.dispatchers.set(event_name, dispatcher);
+	}
+
+	/**
+	 * Get dispatchers size.
+	 *
+	 * @returns {number}
+	 * @public
+	 * @since 2.0.0
+	 * @memberof LocalEventDriver
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public size(): number {
+		return this.dispatchers.size;
 	}
 }

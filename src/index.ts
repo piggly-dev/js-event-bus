@@ -1,15 +1,15 @@
 import { EventBus } from './core/EventBus';
 
-export { EventPayload } from './core/EventPayload';
-export { EventDispatcher } from './core/EventDispatcher';
 export { LocalEventDriver } from './core/drivers/LocalEventDriver';
+export { EventDispatcher } from './core/EventDispatcher';
+export { EventPayload } from './core/EventPayload';
 
 export type {
-	EventDriverInterface,
-	EventBusOptions,
-	EventDispatcherResponse,
-	EventHandlerCallback,
 	AsyncEventHandlerCallback,
+	EventDispatcherResponse,
+	EventDriverInterface,
+	EventHandlerCallback,
+	EventBusOptions,
 	EventHandler,
 } from './core/types';
 

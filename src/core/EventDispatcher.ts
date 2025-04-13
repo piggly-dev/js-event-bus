@@ -1,6 +1,6 @@
-import { EventPayload } from './EventPayload';
-
 import type { EventDispatcherResponse, EventHandler } from './types';
+
+import { EventPayload } from './EventPayload';
 
 /**
  * @file Event dispatcher, where you can register handlers to an unique event and dispatch to them.
@@ -57,7 +57,7 @@ export class EventDispatcher {
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public async dispatch<Event extends EventPayload>(
-		event: Event
+		event: Event,
 	): Promise<EventDispatcherResponse> {
 		if (event.name !== this.name) {
 			return [];
@@ -74,7 +74,7 @@ export class EventDispatcher {
 				} catch (err: any) {
 					return Promise.reject(err);
 				}
-			})
+			}),
 		);
 	}
 
@@ -89,7 +89,7 @@ export class EventDispatcher {
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public register<Event extends EventPayload>(
-		handler: EventHandler<Event>
+		handler: EventHandler<Event>,
 	): boolean {
 		if (this.handlers.find(h => h === handler)) {
 			return false;
@@ -110,7 +110,7 @@ export class EventDispatcher {
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public unregister<Event extends EventPayload>(
-		handler: EventHandler<Event>
+		handler: EventHandler<Event>,
 	): boolean {
 		const index = this.handlers.findIndex(h => h === handler);
 

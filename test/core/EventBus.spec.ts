@@ -97,7 +97,7 @@ describe('EventBus', () => {
 		const getFn = jest.fn().mockReturnValue(undefined);
 		jest.spyOn(LocalEventDriver.prototype, 'get').mockImplementation(getFn);
 
-		expect(EventBus.instance.publish(payload)).resolves.toBe(undefined);
+		expect(EventBus.instance.publish(payload)).resolves.toStrictEqual([]);
 		expect(getFn).toHaveBeenCalledWith('STUB_EVENT');
 	});
 
@@ -127,7 +127,7 @@ describe('EventBus', () => {
 
 		// Return false because there is nothing to unsubscribe
 		expect(
-			EventBus.instance.unsubscribeAll('ANY_EVENT', { driver: 'custom' })
+			EventBus.instance.unsubscribeAll('ANY_EVENT', { driver: 'custom' }),
 		).toBe(false);
 	});
 });

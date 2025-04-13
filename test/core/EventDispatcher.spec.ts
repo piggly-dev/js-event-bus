@@ -70,15 +70,15 @@ describe('EventDispatcher', () => {
 		it('should not dispatch events for incompatible events', () => {
 			const dispatcher = new EventDispatcher('STUB_EVENT');
 			expect(
-				dispatcher.dispatch(new AnotherStubEventPayload({ amount: 42 }))
-			).resolves.toBe(undefined);
+				dispatcher.dispatch(new AnotherStubEventPayload({ amount: 42 })),
+			).resolves.toStrictEqual([]);
 		});
 
 		it('should not dispatch events for any handlers', () => {
 			const dispatcher = new EventDispatcher('STUB_EVENT');
 			expect(
-				dispatcher.dispatch(new StubEventPayload({ size: 42 }))
-			).resolves.toBe(undefined);
+				dispatcher.dispatch(new StubEventPayload({ size: 42 })),
+			).resolves.toStrictEqual([]);
 		});
 
 		it('should dispatch events for any handlers', async () => {

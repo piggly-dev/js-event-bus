@@ -63,4 +63,8 @@ export class CustomEventDriver implements EventDriverInterface {
 	public size(): number {
 		return this.dispatchers.size;
 	}
+
+	public error(error: Error): void {
+		console.error(error);
+	}
 }
