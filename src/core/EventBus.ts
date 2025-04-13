@@ -170,6 +170,11 @@ export class EventBus {
 	 *   b) Will be useful for wait_onclean events that must be processed and waited to finish.
 	 *   c) In a graceful shutdown, for example.
 	 *
+	 * Tip: You may want to use wait_onclean for events that should be completed on a
+	 *      graceful shutdown or interruption, for example. It will heavily increase
+	 *      memory usage if you have a lot of events to wait.
+	 *
+	 * @important Be careful when using wait_onclean, it will hold promises on memory till they are settled.
 	 * @param {Event} event Event payload object.
 	 * @param {boolean} wait_onclean If true, the event will be sent as wait_onclean.
 	 * @param {EventBusOptions} options With driver name.
@@ -182,7 +187,7 @@ export class EventBus {
 	 */
 	public send<Event extends EventPayload>(
 		event: Event,
-		wait_onclean = false,
+		wait_onclean: boolean = false,
 		options?: EventBusOptions
 	): void {
 		const driver = this.driver(options);
