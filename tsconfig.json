@@ -31,7 +31,7 @@
 		"typeRoots": ["<rootDir>/src/types", "node_modules/@types"],
 		"types": ["node", "jest"]
 	},
-	"include": ["./src/**/*", "./debug/**/*", "./test/**/*"],
+	"include": ["./src/**/*", "./debug/**/*", "./test/**/*", "benchmark"],
 	"exclude": ["./node_modules/**/*", "./build/**/*"],
 	"tsc-alias": {
 		"resolveFullPaths": true

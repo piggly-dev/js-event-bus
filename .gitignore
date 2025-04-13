@@ -245,3 +245,5 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/dotenv,windows,linux,macos,visualstudiocode,node
 *.code-workspace
+.clinic
+/benchmark

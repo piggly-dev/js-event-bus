@@ -1,3 +1,5 @@
+import debug from 'debug';
+
 import { EventDispatcher } from './EventDispatcher';
 import { EventPayload } from './EventPayload';
 import { LocalEventDriver } from './drivers/LocalEventDriver';
@@ -100,10 +102,9 @@ export class EventBus {
 	 *
 	 * @param {Event} event Event payload object.
 	 * @param {EventBusOptions} options With driver name.
-	 * @returns {boolean}
+	 * @returns {Promise<EventDispatcherResponse>}
 	 * @public
 	 * @since 1.0.0
-	 * @since 2.2.0 Added promise tracking.
 	 * @memberof EventBus
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
@@ -115,22 +116,87 @@ export class EventBus {
 		const dispatcher = driver.get(event.name);
 
 		if (dispatcher === undefined) {
-			return undefined;
+			return [];
+		}
+
+		debug('eventbus:publish')(`published ${event.name}`);
+		return dispatcher.dispatch<Event>(event);
+	}
+
+	/**
+	 * Send an event to event bus, where Event is an event payload object.
+	 * It will not wait for the event to be processed. But:
+	 *
+	 * - When error callback is set on driver, it will be called when something goes wrong.
+	 * - When critical is true, the event will be added to the pool.
+	 *   a) Later, you may use cleanup method to wait for all pending promises on pool.
+	 *   b) Will be useful for critical events that must be processed and waited to finish.
+	 *   c) In a graceful shutdown, for example.
+	 *
+	 * @param {Event} event Event payload object.
+	 * @param {boolean} critical If true, the event will be sent as critical.
+	 * @param {EventBusOptions} options With driver name.
+	 * @returns {void}
+	 * @public
+	 * @since 1.0.0
+	 * @since 2.2.0 Added promise tracking.
+	 * @memberof EventBus
+	 * @author Caique Araujo <caique@piggly.com.br>
+	 */
+	public send<Event extends EventPayload>(
+		event: Event,
+		critical = false,
+		options?: EventBusOptions
+	): void {
+		const driver = this.driver(options);
+		const dispatcher = driver.get(event.name);
+
+		if (dispatcher === undefined) {
+			return;
+		}
+
+		if (critical === false) {
+			dispatcher
+				.dispatch<Event>(event)
+				.then(e => {
+					e.forEach(r => {
+						if (r.status === 'fulfilled') {
+							debug('eventbus:publish')(`sent.resolved ${event.name}`);
+						} else {
+							driver.error(r.reason);
+						}
+					});
+				})
+				.catch(driver.error);
+
+			return;
 		}
 
 		const promise = dispatcher.dispatch<Event>(event);
 
-		if (promise === undefined) {
-			return undefined;
-		}
-
-		promise.finally(() => {
-			this._ongoing.delete(promise);
-		});
-
 		this._ongoing.add(promise);
+		debug('eventbus:publish')(`sent ${event.name}; pool: ${this._ongoing.size}`);
 
-		return promise;
+		const handleFinally = () => {
+			this._ongoing.delete(promise);
+
+			debug('eventbus:publish')(
+				`send.removed ${event.name}; pool: ${this._ongoing.size}`
+			);
+		};
+
+		promise
+			.then(e => {
+				e.forEach(r => {
+					if (r.status === 'fulfilled') {
+						debug('eventbus:publish')(`sent.resolved ${event.name}`);
+					} else {
+						driver.error(r.reason);
+					}
+				});
+			})
+			.catch(driver.error)
+			.finally(handleFinally);
 	}
 
 	/**
@@ -213,7 +279,14 @@ export class EventBus {
 	/**
 	 * The cleanup method will:
 	 *
-	 * - Remove all pending promises.
+	 * - Wait for all pending promises triggered by send method.
+	 * - Clear the pool of pending promises.
+	 *
+	 * Useful for:
+	 *
+	 * - Flush pool of pending promises.
+	 * - Ensure all promises are settled.
+	 * - Gracefully shutdown your application.
 	 *
 	 * @returns {Promise<void>}
 	 * @public
@@ -222,12 +295,14 @@ export class EventBus {
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
 	public async cleanup(): Promise<void> {
-		await Promise.allSettled(Array.from(this._ongoing));
-
-		this._ongoing.clear();
+		debug('eventbus:cleanup')('cleaning up');
+		await Promise.allSettled(this._ongoing);
+		this._ongoing = new Set();
+		debug('eventbus:cleanup')('cleaned up');
 	}
 
 	/**
+	 * Get driver instance.
 	 *
 	 * @param {EventBusOptions} options
 	 * @returns {EventDriverInterface}
@@ -249,5 +324,17 @@ export class EventBus {
 		}
 
 		return driver;
+	}
+
+	/**
+	 * Get the number of ongoing promises.
+	 *
+	 * @returns {number}
+	 * @public
+	 * @since 2.2.0
+	 * @memberof EventBus
+	 */
+	public get ongoing(): number {
+		return this._ongoing.size;
 	}
 }

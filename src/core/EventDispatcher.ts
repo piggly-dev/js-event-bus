@@ -17,7 +17,7 @@ export class EventDispatcher {
 	 * @memberof EventDispatcher
 	 * @author Caique Araujo <caique@piggly.com.br>
 	 */
-	public readonly handlers: Array<EventHandler<any>>;
+	public handlers: Array<EventHandler<any>>;
 
 	/**
 	 * Event name.
@@ -60,11 +60,11 @@ export class EventDispatcher {
 		event: Event
 	): Promise<EventDispatcherResponse> {
 		if (event.name !== this.name) {
-			return undefined;
+			return [];
 		}
 
 		if (this.handlers.length === 0) {
-			return undefined;
+			return [];
 		}
 
 		return Promise.allSettled(
@@ -112,7 +112,6 @@ export class EventDispatcher {
 	public unregister<Event extends EventPayload>(
 		handler: EventHandler<Event>
 	): boolean {
-		// const index = this.handlers.indexOf(handler);
 		const index = this.handlers.findIndex(h => h === handler);
 
 		if (index === -1) {
@@ -137,7 +136,7 @@ export class EventDispatcher {
 			return false;
 		}
 
-		this.handlers.splice(0, this.handlers.length);
+		this.handlers = [];
 		return true;
 	}
 }

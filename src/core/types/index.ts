@@ -7,13 +7,14 @@ export interface EventDriverInterface {
 	get(event_name: string): EventDispatcher | undefined;
 	has(event_name: string): boolean;
 	size(): number;
+	error(error: Error): void;
 }
 
 export type EventBusOptions = {
 	driver: string;
 };
 
-export type EventDispatcherResponse = PromiseSettledResult<boolean>[] | undefined;
+export type EventDispatcherResponse = Array<PromiseSettledResult<boolean>>;
 
 export type EventHandlerCallback<Event extends EventPayload = EventPayload> = (
 	event: Event
